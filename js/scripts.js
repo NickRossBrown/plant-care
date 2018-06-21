@@ -14,7 +14,7 @@ Plant.prototype.makeSchedule = function(taskKey) {
 
   if (taskKey[0] === "Once a week") {
     var firstDay = new Date(new Date().setHours(0,0,0,0))
-    var dayOfWeek = firstDay.getDay()
+    var dayOfWeek = new Date(new Date().setHours(0,0,0,0))
     while(firstDay.getDay() !== weekdayArray.indexOf(taskKey[1])){
       firstDay.setDate(firstDay.getDate() + 1)
     }
@@ -101,6 +101,12 @@ function makeUniqueWeekDays(weekEvents) {
 
 function sortIntoWeeksAndFormat(allEvents) {
 
+  $("#week-glance-tasks").text("")
+  $("#week-one-tasks").text("")
+  $("#week-two-tasks").text("")
+  $("#week-three-tasks").text("")
+  $("#week-four-tasks").text("")
+
   var weekOneRange = [today, (new Date(new Date(today.getFullYear(), today.getMonth(), today.getDate() + 6).setHours(0,0,0,0)))];
   var weekTwoRange = [(new Date(new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7).setHours(0,0,0,0))), (new Date(new Date(today.getFullYear(), today.getMonth(), today.getDate() + 13).setHours(0,0,0,0)))]
   var weekThreeRange = [(new Date(new Date(today.getFullYear(), today.getMonth(), today.getDate() + 14).setHours(0,0,0,0))), (new Date(new Date(today.getFullYear(), today.getMonth(), today.getDate() + 20).setHours(0,0,0,0)))]
@@ -160,7 +166,7 @@ function sortIntoWeeksAndFormat(allEvents) {
         $("#week-one-tasks").append("<div class='form-check'>" +
                                 "<label class='form-check-label'>" +
                                 "<input class='form-check-input' type='checkbox'>" +
-                                weekOneEvents[n][2] + " " + weekOneEvents[n][1] +
+                                weekOneEvents[n][2] + " " + weekOneEvents[n][1] + " the " + weekOneEvents[n][3] +
                                 "</label>" +
                                 "</div>")
       }
@@ -174,7 +180,7 @@ function sortIntoWeeksAndFormat(allEvents) {
         $("#week-two-tasks").append("<div class='form-check'>" +
                                 "<label class='form-check-label'>" +
                                 "<input class='form-check-input' type='checkbox'>" +
-                                weekTwoEvents[p][2] + " " + weekTwoEvents[p][1] +
+                                weekTwoEvents[p][2] + " " + weekTwoEvents[p][1] + " the " + weekTwoEvents[p][3] +
                                 "</label>" +
                                 "</div>")
       }
@@ -187,7 +193,7 @@ function sortIntoWeeksAndFormat(allEvents) {
         $("#week-three-tasks").append("<div class='form-check'>" +
                                 "<label class='form-check-label'>" +
                                 "<input class='form-check-input' type='checkbox'>" +
-                                weekThreeEvents[y][2] + " " + weekThreeEvents[y][1] +
+                                weekThreeEvents[y][2] + " " + weekThreeEvents[y][1] + " the " + weekThreeEvents[y][3] +
                                 "</label>" +
                                 "</div>")
       }
@@ -200,7 +206,7 @@ function sortIntoWeeksAndFormat(allEvents) {
         $("#week-four-tasks").append("<div class='form-check'>" +
                                 "<label class='form-check-label'>" +
                                 "<input class='form-check-input' type='checkbox'>" +
-                                weekFourEvents[b][2] + " " + weekFourEvents[b][1] +
+                                weekFourEvents[b][2] + " " + weekFourEvents[b][1] + " the " + weekFourEvents[b][3] +
                                 "</label>" +
                                 "</div>")
       }
@@ -213,7 +219,7 @@ function sortIntoWeeksAndFormat(allEvents) {
         $("#week-glance-tasks").append("<div class='form-check'>" +
                                 "<label class='form-check-label'>" +
                                 "<input class='form-check-input' type='checkbox'>" +
-                                glanceEvents[j][2] + " " + glanceEvents[j][1] +
+                                glanceEvents[j][2] + " " + glanceEvents[j][1] + " the " + glanceEvents[j][3] +
                                 "</label>" +
                                 "</div>")
       }
@@ -228,19 +234,19 @@ function makeCalendar(everyPlant) {
     var waterDays = plant.makeSchedule(plant.water)
     for (i = 0; i < waterDays.length; i++) {
       var singleWaterEvent = [];
-      singleWaterEvent.push(waterDays[i], plant.commonName, "Water");
+      singleWaterEvent.push(waterDays[i], plant.nickName, "Water", plant.commonName);
       allEvents.push(singleWaterEvent)
     }
     var pruningDays = plant.makeSchedule(plant.pruning)
     for (x = 0; x < pruningDays.length; x++) {
       var singlePruneEvent = [];
-      singlePruneEvent.push(pruningDays[x], plant.commonName, "Prune");
+      singlePruneEvent.push(pruningDays[x], plant.nickName, "Prune", plant.commonName);
       allEvents.push(singlePruneEvent)
     }
     var fertilizingDays = plant.makeSchedule(plant.fertilizing)
     for (y = 0; y < fertilizingDays.length; y++) {
       var singleFertilizeEvent = [];
-      singleFertilizeEvent.push(fertilizingDays[y], plant.commonName, "Fertilize");
+      singleFertilizeEvent.push(fertilizingDays[y], plant.nickName, "Fertilize", plant.commonName);
       allEvents.push(singleFertilizeEvent)
     }
   })
@@ -268,7 +274,7 @@ function checkboxlimit(checkgroup, limit){
     for (var i=0; i<checkgroup.length; i++)
       checkedcount+=(checkgroup[i].checked)? 1 : 0
     if (checkedcount>limit){
-      alert("You can only select a maximum of "+limit+" checkboxes")
+      alert("You can only select a maximum of "+limit+" checkboxes.")
       this.checked=false
       }
     }
@@ -284,42 +290,115 @@ function validateCommonName(commonName, customCommonName){
   var validatedCommonName
   if (commonName === "Create your own" && customCommonName !== ""){
     validatedCommonName = customCommonName
-    console.log("this is the validated commonName " + validatedCommonName)
   } else if (commonName !== "Select a plant to begin" && commonName !== "Create your own"){
       validatedCommonName = commonName
   } else{
-    alert("what kind of plant is this")
+    alert("What kind of plant is this?")
+    validatedCommonName = ""
   }
-  console.log("the validated commonName is " + validatedCommonName)
+  return validatedCommonName
 }//END OF validateCommonName
 
 function validateNickName(nickName){
   var validatedNickName
   //validate nickname
   if(nickName !== ""){
-    console.log("in the if statement")
     // if this is the first entry then just validate the nickname, otherwise check to see if name is taken
     if(allUserPlants.length > 0){
     //check if name is taken already
       for(i=0; i < allUserPlants.length; ++i){
-        console.log("in the for loop")
         if(nickName === allUserPlants[i].nickName){
-          alert("please pick another name")
+          alert("Please pick another name. " + nickName + " is already taken.")
+          validatedNickName = ""
         } else{
-          console.log("this is the current nickName:" + validatedNickName)
           validatedNickName = nickName
           break
         }
       }
-    } else(validatedNickName = nickName)
+    } else {
+      validatedNickName = nickName
+    }
   } else {
     alert("Please enter a nickname for your plant")
+    validatedNickName = ""
   }
-  console.log("the validated nickname is " + validatedNickName)
+  return validatedNickName
 }//END OF validateNickName
 
 //user logic
+
+
+function getTemplatePlantDetails(){
+  // var nickname = $("#nickNameInput").val()
+  var plantName = $("#selectPlant :selected").text()
+  for(plant = 0; plant < allPlantTemplates.length; ++plant){
+    if(plantName === allPlantTemplates[plant].commonName){
+      //get values for selected plant
+      var sunlight = allPlantTemplates[plant].sunlight
+      var hardiness = allPlantTemplates[plant].hardiness
+      var waterFrequency = allPlantTemplates[plant].water[0]
+      var pruningFrequency = allPlantTemplates[plant].pruning[0]
+      var fertilizingFrequency = allPlantTemplates[plant].fertilizing[0]
+      //update option shown in dropdown menus
+      updatePlantDetails("sunlightSelection", sunlight)
+      updatePlantDetails("hardinessSelection", hardiness)
+      updatePlantDetails("waterSelection", waterFrequency)
+      updatePlantDetails("pruningSelection", pruningFrequency)
+      updatePlantDetails("fertilizingSelection", fertilizingFrequency)
+    }
+  }
+} //END getTemplatePlantDetails
+
+function isOptionAlreadySelected(elementId){
+  var water =  $("#" + elementId + " :selected").text()
+  if(water !== "Select a value"){
+    showHideMonthWeek(elementId)
+  }
+}
+
+function hasDropdownOptionBeenSelected(value){
+  if(value === "Select a value"){
+    return false
+  } else {
+    return true
+  }
+}
+
+function resetDropdown(dropdownId){
+  document.getElementById(dropdownId).selectedIndex = 0
+}
+
+function validateTaskInputs(taskFrequency, taskDayCheckboxes, taskMonthSelection){
+  validatedArray = []
+  if(taskDayCheckboxes.length > 0){
+    validatedArray.push(taskFrequency)
+    for(i=0; i < taskDayCheckboxes.length; ++i){
+      validatedArray.push(taskDayCheckboxes[i])
+    }
+    return validatedArray
+  } else if(taskMonthSelection !== "Select a date"){
+    validatedArray = [] = [taskFrequency, parseInt(taskMonthSelection)]
+    return validatedArray
+  }
+  // else{
+  //   alert("Select a day.")
+  // }
+} //END validateTaskInputs
+
+//user logic
+
+// homepage
+//
+
 $(function(){
+  //Hide Plant detail divs
+  $(".homepage").show();
+  $("#plantEntryStepTwo").hide()
+  $(".waterDiv").hide()
+  $(".pruningDiv").hide()
+  $(".fertilizingDiv").hide()
+  $(".container").hide();
+
   $(".linkhomepage").click(function(event){
     event.preventDefault();
     $(".homepage").show();
@@ -328,32 +407,36 @@ $(function(){
 
   $(".myplantslink").click(function(event){
     event.preventDefault();
+    $("#myGarden").empty();
+    var everyPlant = testPlants.concat(allUserPlants);
+    appendToGarden(everyPlant)
     $(".homepage").hide();
     $(".container").show();
-    $("#calendar-container").hide();
+    $("#calendar-display").hide();
     $("#plantEntryForm").hide();
     $("#myPlants-display").show();
     $("#helppage").hide();
+
 
   });
   $(".schedulelink").click(function(event){
     event.preventDefault();
     $(".homepage").hide();
     $(".container").show();
-    $("#calendar-container").show();
+    $("#calendar-display").show();
     $("#plantEntryForm").hide();
     $("#myPlants-display").hide();
     $("#helppage").hide();
-// the rest here is same code as the refresh button
     var everyPlant = testPlants.concat(allUserPlants);
     var allEvents = makeCalendar(everyPlant);
     sortIntoWeeksAndFormat(allEvents);
+
   });
   $(".addplantlink").click(function(event){
     event.preventDefault();
     $(".homepage").hide();
     $(".container").show();
-    $("#calendar-container").hide();
+    $("#calendar-display").hide();
     $("#plantEntryForm").show()
     $("#myPlants-display").hide();
     $("#helppage").hide();
@@ -362,18 +445,11 @@ $(function(){
     event.preventDefault();
     $(".homepage").hide();
     $(".container").show();
-    $("#calendar-container").hide();
+    $("#calendar-display").hide();
     $("#plantEntryForm").hide();
     $("#myPlants-display").hide();
     $("#helppage").show();
   });
-
-
-  //Hide Plant detail divs
-  $("#plantEntryStepTwo").hide()
-  $(".waterDiv").hide()
-  $(".pruningDiv").hide()
-  $(".fertilizingDiv").hide()
 
   //STEP ONE - Name plant and select its type
   $("#createPlant").click(function(event){
@@ -381,100 +457,230 @@ $(function(){
     var nickName = $("#nickNameInput").val()
     var commonName = $("#selectPlant").val()
     var customCommonName = $("#customCommonName").val()
-    validateNickName(nickName)
-    validateCommonName(commonName, customCommonName)
-    previewFile();
-  });
+    var validatedNickName =validateNickName(nickName)
+    if(validatedNickName !== ""){
+      var validatedCommonName = validateCommonName(commonName, customCommonName);
+      if(validatedCommonName !== ""){
+       $("#plantEntryStepTwo").show()
+       $("#detailsHeader").show()
+       $(".plantName").text(nickName + " the " + validatedCommonName)
+       getTemplatePlantDetails()
+       $("#nickNameInput").prop("readonly", true)
+       $("#selectPlant").attr("disabled", true)
+       $("#customCommonName").prop("readonly", true)
+       $("#createPlant").hide()
+       $("#resetCreatePlant").show()
 
-  // STEP TWO - fill in plant details if a template plant is selected
-  document.getElementById("selectPlant").onchange = function(){
-    var nickname = $("#nickNameInput").val()
+     }
+    }
+  });
+    document.getElementById("selectPlant").onchange = function(){
     var plantName = $("#selectPlant :selected").text()
-    for(plant = 0; plant < allPlantTemplates.length; ++plant){
-      if(plantName === allPlantTemplates[plant].commonName){
-        //get values for selected plant
-        var sunlight = allPlantTemplates[plant].sunlight
-        var hardiness = allPlantTemplates[plant].hardiness
-        var waterFrequency = allPlantTemplates[plant].water[0]
-        var pruningFrequency = allPlantTemplates[plant].pruning[0]
-        var fertilizingFrequency = allPlantTemplates[plant].fertilizing[0]
-        //update option shown in dropdown menus
-        updatePlantDetails("sunlightSelection", sunlight)
-        updatePlantDetails("hardinessSelection", hardiness)
-        updatePlantDetails("waterSelection", waterFrequency)
-        updatePlantDetails("pruningSelection", pruningFrequency)
-        updatePlantDetails("fertilizingSelection", fertilizingFrequency)
-       // show or hide month or week selection divs
-       showHideMonthWeek("waterSelection");
-       showHideMonthWeek("pruningSelection");
-       showHideMonthWeek("fertilizingSelection");
-       $("#commonNameDiv").hide()
-     } else if (plantName === "Create your own") {
+    if (plantName !== "Create your own") {
+        $("#commonNameDiv").hide()
+      } else {
         $("#commonNameDiv").show()
-        // document.getElementById("plantEntryForm").reset();
-        $("#selectPlant").val("Create your own");
-        showHideMonthWeek("waterSelection");
-        showHideMonthWeek("pruningSelection");
-        showHideMonthWeek("fertilizingSelection");
       }
     }
-  };//END OF ONCHANGE FOR SELECTPLANT
+
+  // STEP TWO -Select & validate sunlight and hardiness, show water div
+  $("#sunNext").click(function(){
+    var sunlight = $("#sunlightSelection :selected").text()
+    var hardiness = $("#hardinessSelection :selected").text()
+    if(hasDropdownOptionBeenSelected(sunlight)){
+      if(hasDropdownOptionBeenSelected(hardiness)){
+        $("#sunNext").hide()
+        $("#sunReset").show()
+        $(".waterDiv").show()
+        $("#plantEntryStepTwo").removeClass("bottomBorder");
+        $(".waterDiv").addClass("bottomBorder");
+        isOptionAlreadySelected("waterSelection")
+        $("#sunlightSelection").attr("disabled", true)
+        $("#hardinessSelection").attr("disabled", true)
+      } else{
+        alert("Please select hardiness level")
+      }
+    } else {
+      alert("Please select sunlight needs")
+    }
+  })
+
+    //STEP THREE - Water div, show pruning
+  $("#waterNext").click(function(){
+    var water = $("#waterSelection :selected").text()
+    var waterMonthday = $("#waterMonthDropdown :selected").text()
+    var waterCheckBoxes = []
+    $("input:checkbox[name=waterSelectionCheckBoxes]:checked").each(function(){
+      waterCheckBoxes.push($(this).val());
+    })
+    // $("input:checkbox[name=waterSelectionCheckBoxes]:checked").each(function(){
+    //   waterCheckBoxes.push($(this).val());
+    // })
+    if(hasDropdownOptionBeenSelected(water)){
+      if(waterCheckBoxes.length > 0 || waterMonthday !== "Select a date"){
+        $("#waterNext").hide()
+        $("#waterReset").show()
+        $(".pruningDiv").show()
+        $(".waterDiv").removeClass("bottomBorder");
+        $(".pruningDiv").addClass("bottomBorder");
+        isOptionAlreadySelected("pruningSelection")
+        $("#waterSelection").attr("disabled", true)
+        $("#waterMonthDropdown").attr("disabled", true)
+        $("#waterSelectionWeekday input").attr("disabled", true)
+      } else {
+        alert("Please select when you will water")
+      }
+    } else {
+      alert("Please select how often to water")
+    }
+  })
+
+  //STEP FOUR -Pruning div, show fertilizing div
+  $("#pruningNext").click(function(){
+    var prune = $("#pruningSelection :selected").text()
+    var pruneMonthday = $("#pruneMonthDropdown :selected").text()
+    var pruneCheckBoxes = []
+    $("input:checkbox[name=pruningSelectionCheckBoxes]:checked").each(function(){
+      pruneCheckBoxes.push($(this).val());
+    })
+    if(hasDropdownOptionBeenSelected(prune)){
+      if(pruneCheckBoxes.length > 0 || pruneMonthday !== "Select a date"){
+        $("#pruningNext").hide()
+        $("#pruningReset").show()
+        $(".fertilizingDiv").show()
+        $(".pruningDiv").removeClass("bottomBorder");
+        $(".fertilizingDiv").addClass("bottomBorder");
+        isOptionAlreadySelected("fertilizingSelection")
+        $("#pruningSelection").attr("disabled", true)
+        $("#pruneMonthDropdown").attr("disabled", true)
+        $("#pruningSelectionWeekday input").attr("disabled", true)
+      } else {
+        alert("Please select when you will prune")
+      }
+    } else {
+      alert("Please select how often to prune")
+    }
+  })
+
+  // RESET BUTTONS
+  $("#resetCreatePlant").click(function(){
+    // reset values
+    resetDropdown("selectPlant")
+    $("#nickNameInput").val("")
+    $("#nickNameInput").val("")
+    //swap buttons
+    $("#resetCreatePlant").hide()
+    $("#createPlant").show()
+     $("#commonNameDiv").hide()
+    //enable all fields, dropdowns
+    $("#selectPlant").attr("disabled", false)
+    $("#nickNameInput").prop("readonly", false)
+    $("#customCommonName").prop("readonly", false)
+  })
+
+  $("#sunReset").click(function(){
+    resetDropdown("sunlightSelection")
+    resetDropdown("hardinessSelection")
+    $("#sunlightSelection").attr("disabled", false)
+    $("#hardinessSelection").attr("disabled", false)
+    $("#sunReset").hide()
+    $("#sunNext").show()
+  })
+
+  $("#waterReset").click(function(){
+    resetDropdown("waterSelection")
+    resetDropdown("waterMonthDropdown")
+    $("#waterSelectionWeekday input").prop("checked", false);
+    $("#waterSelection").attr("disabled", false)
+    $("#waterSelectionWeekday input").attr("disabled", false)
+    $("#waterMonthDropdown").attr("disabled", false)
+    $("#waterReset").hide()
+    $("#waterNext").show()
+  })
+
+  $("#pruningReset").click(function(){
+    resetDropdown("pruningSelection")
+    resetDropdown("pruneMonthDropdown")
+    $("#pruningSelectionWeekday input").prop("checked", false);
+    $("#pruningSelection").attr("disabled", false)
+    $("#pruningSelectionWeekday input").attr("disabled", false)
+    $("#pruneMonthDropdown").attr("disabled", false)
+    $("#pruningReset").hide()
+    $("#pruningNext").show()
+  })
 
   $("#plantEntryForm").submit(function(event){
     event.preventDefault();
     var nickName = $("#nickNameInput").val()
+    var validatedNickName = validateNickName(nickName)
     var commonName = $("#selectPlant").val()
-    var photo = $("img#src").val();
+    var customCommonName = $("#customCommonName").val()
+    var validatedCommonName = validateCommonName(commonName, customCommonName)
     var sunlight = $("#sunlightSelection :selected").text()
     var hardiness = $("#hardinessSelection :selected").text()
+    //water variables
     var water =  $("#waterSelection :selected").text()
     var waterCheckBoxes = []
     $("input:checkbox[name=waterSelectionCheckBoxes]:checked").each(function(){
       waterCheckBoxes.push($(this).val());
     })
-    console.log("waterCheckBoxes array is: " + waterCheckBoxes)
-    var waterArray =[]
     var waterMonthday = $("#waterMonthDropdown :selected").text()
+    var waterArray = validateTaskInputs(water, waterCheckBoxes, waterMonthday)
+    // pruning variables
     var prune = $("#pruningSelection :selected").text()
+    var pruneCheckBoxes = []
+    $("input:checkbox[name=pruningSelectionCheckBoxes]:checked").each(function(){
+      pruneCheckBoxes.push($(this).val());
+    })
     var pruneWeekday = $("#pruningSelectionWeekday :checked").val()
     var pruneMonthday = $("#pruneMonthDropdown :selected").text()
+    var pruningArray = validateTaskInputs(prune, pruneCheckBoxes, pruneMonthday)
+    // fertilizing variables
     var fertilizing = $("#fertilizingSelection :selected").text()
+    var fertilizingCheckBoxes = []
+    $("input:checkbox[name=fertilizingSelectionCheckBoxes]:checked").each(function(){
+      fertilizingCheckBoxes.push($(this).val());
+    })
     var fertilizeWeekday = $("#fertilizingSelectionWeekday :checked").val()
     var fertilizeMonthday = $("#fertilizingMonthDropdown :selected").text()
-
-    //NEED TO UPDATE TO MAKE SURE USER HAS SELECTED ALL NECESSARY SELECTIONS FOR ALL FIELDS
-    if(waterCheckBoxes.length > 0){
-      console.log("water var is: " + water)
-      waterArray.push(water)
-      for(i=0; i< waterCheckBoxes.length; ++i){
-        waterArray.push(waterCheckBoxes[i])
-        console.log(waterCheckBoxes[i])
-        console.log("water array: " + waterArray)
+    var fertilizingArray = validateTaskInputs(fertilizing, fertilizingCheckBoxes, fertilizeMonthday)
+    if(hasDropdownOptionBeenSelected(fertilizing)){
+      if(fertilizingCheckBoxes.length > 0 || fertilizeMonthday !== "Select a date"){
+        //create new plant
+        var newPlant = new Plant (validatedCommonName, sunlight, hardiness, waterArray, pruningArray, fertilizingArray)
+        Plant.prototype.addUsersDetails(newPlant, validatedNickName)
+        allUserPlants.push(newPlant);
+        document.getElementById("plantEntryForm").reset();
+        $("#plantEntryStepTwo").hide()
+        $(".waterDiv").hide()
+        $(".pruningDiv").hide()
+        $(".fertilizingDiv").hide()
+        $("#resetCreatePlant").hide()
+        $("#createPlant").show()
+        $("#plantEntryForm input").attr("disabled", false)
+        $("#plantEntryForm select").attr("disabled", false)
+        $("#nickNameInput").prop("readonly", false)
+        $("#customCommonName").prop("readonly", false)
+        $(".nextButtons").show()
+        $(".resetButtons").hide()
+        $("#plantEntryStepTwo").hide()
+        $("#detailMsg").hide()
+        $("#confirmMsg").show()
+      } else {
+        alert("Please select when you will fertilize.")
       }
-      var newPlant = new Plant (commonName, sunlight, hardiness, waterArray, prune, fertilizing)
-    } else if(waterMonthday !== "Select a date"){
-      console.log(waterMonthday)
-      waterArray = [water, parseInt(waterMonthday)]
-      var newPlant = new Plant (commonName, sunlight, hardiness, waterArray, prune, fertilizing)
-    } else{
-      alert("Select your water day.")
+    } else {
+      alert("Please select how often to fertilize.")
     }
-    // if(waterArray.length >= 2){
-    //   var newPlant = new Plant (commonName, sunlight, hardiness, waterArray, prune, fertilizing)
-    //   console.log(newPlant)
-    //   console.log("water dates" + newPlant.makeSchedule(newPlant.water))
-    //   // console.log("prune dates" + newPlant.makeSchedule(newPlant.pruning))
-    // } else{
-    //   console.log("in the else for the water check if")
-    // }
-    allUserPlants.push(newPlant);
-    Plant.prototype.addUsersDetails(newPlant, nickName)
-
-    //appends unique nickname and common name to myplants
-    $("#myGarden").append("<div class='newPlant col-md-3'>" +
-                        "<h2 id='unique-name'>" + nickName + "</h2>" + "<h3 id='common-name'>" + commonName + "</h3>" + "<img src='img/" + commonName + ".jpg'>" + "</div>")
-
   }) //END SUBMIT CLICK EVENT
+
+  // document.getElementById("selectPlant").onchange = function(){
+  //   var selectedPlant = $("#selectPlant").val()
+  //   if(selectdPlant !== "Creat your own"){
+  //     $("#commonNameDiv").hide();
+  //   }
+  //
+  // };
 
   document.getElementById("waterSelection").onchange = function(){
     var elementId = "waterSelection"
@@ -490,6 +696,7 @@ $(function(){
     var elementId = "fertilizingSelection"
     showHideMonthWeek(elementId)
   };
+});
 
 // NOT USING THIS YET
 function checkNickname(nickname, myPlants){
@@ -501,34 +708,33 @@ function checkNickname(nickname, myPlants){
       console.log("this is a valid nickname")
     }
   }
-}
-
-  $("#refreshButton").click(function(event){
-    event.preventDefault();
-    var everyPlant = testPlants.concat(allUserPlants);
-    var allEvents = makeCalendar(everyPlant);
-    sortIntoWeeksAndFormat(allEvents);
-  });
-});
+} // NOT USING THE ABOVE FUNCTION
 
 function showHideMonthWeek(elementId){
-  var monthSelection = $("#" + elementId + " :selected").text()
-  if (monthSelection === "Once a month") {
+  var selection = $("#" + elementId + " :selected").text()
+  if (selection === "Once a month") {
     $("#" + elementId + "Weekday").hide();
+    $("#" + elementId + "WeekdayLabel").hide();
     $("#" + elementId + "Month").show();
-  } else if (monthSelection.search("week") > -1) {
+  } else if (selection.search("week") > -1) {
     var limit= parseInt($("#" + elementId + " :selected").val())
     var newVar = ("document.forms.plantEntryForm."+ elementId+"CheckBoxes")
-    console.log(newVar)
     checkboxlimit(eval(newVar), limit)
     $("#" + elementId + "Month").hide();
     $("#" + elementId + "Weekday").show();
+    $("#" + elementId + "WeekdayLabel").show();
   } else {
     $("#" + elementId + "Month").hide();
     $("#" + elementId + "Weekday").hide();
+    $("#" + elementId + "WeekdayLabel").hide();
   }
 }
 
+function appendToGarden(everyPlant) {
+  everyPlant.forEach(function(plant){
+    $("#myGarden").append("<div class ='newPlant col-md-3'>" + "<h2 id=" + plant.nickName + ">" + plant.nickName + "</h2>" + "<h3 id=" + plant.commonName + ">" + plant.commonName + "</h3>" + "<img src='img/" + plant.commonName + ".jpg'>" +"</div>")
+  })
+}
 // Template Plants
 
 
@@ -564,6 +770,15 @@ var xmascactus2 = new Plant ("Christmas Cactus", "Shade", "Average", ["Once a we
 var peacelily2 = new Plant ("Peace Lily", "Indirect Sun", "Very Tolerant", ["Twice a week", "Sunday", "Friday"], ["Once a month", 1], ["Every other week", "Monday"])
 var asparagus2 = new Plant ("Asparagus Fern", "Part Sun", "Temperamental", ["Once a week", "Tuesday"], ["Once a month", 16], ["Once a month", 6])
 var dracena2 = new Plant ("Dracena", "Indirect Sun", "Very Tolerant", ["Every other week", "Wednesday"], ["Once a month", 14], ["Every other week", "Thursday"])
+
+Plant.prototype.addUsersDetails(spider2, "Spidey")
+Plant.prototype.addUsersDetails(snake2, "Slytherin")
+Plant.prototype.addUsersDetails(maple2, "Syrup")
+Plant.prototype.addUsersDetails(aralia2, "Arya")
+Plant.prototype.addUsersDetails(xmascactus2, "Christmas")
+Plant.prototype.addUsersDetails(peacelily2, "Dove")
+Plant.prototype.addUsersDetails(asparagus2, "Sparry")
+Plant.prototype.addUsersDetails(dracena2, "Draco")
 testPlants.push(spider2)
 testPlants.push(snake2)
 testPlants.push(maple2)
