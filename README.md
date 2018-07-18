@@ -52,3 +52,5 @@ This software is licensed under the MIT license.
 
 Copyright (c) 2018 **Team Plant Care**
 
+
+<img width="640" alt="screen shot 2018-07-18 at 11 29 10 am" src="https://user-images.githubusercontent.com/39496805/42900665-51b2c5ac-8a7e-11e8-82ba-fd90c5bc7e8e.png">
